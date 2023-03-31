@@ -85,6 +85,9 @@ class Teambuilder(ABC):
             elif line.startswith("Hidden Power: "):
                 hp_type = line.replace("Hidden Power: ", "").strip()
                 current_mon.hiddenpowertype = hp_type
+            elif line.startswith("Tera Type: "):
+                teratype = line.replace("Tera Type: ", "")
+                current_mon.teratype = teratype.strip()
             else:
                 current_mon = TeambuilderPokemon()
                 current_mon_has_been_added = False

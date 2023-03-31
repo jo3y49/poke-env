@@ -43,6 +43,7 @@ class TeambuilderPokemon:
         happiness=None,
         hiddenpowertype=None,
         gmax=None,
+        teratype=None,
     ):
         self.nickname = nickname
         self.species = species
@@ -55,6 +56,7 @@ class TeambuilderPokemon:
         self.happiness = happiness
         self.hiddenpowertype = hiddenpowertype
         self.gmax = gmax
+        self.teratype = teratype
 
         if evs is not None:
             self.evs = evs
@@ -94,15 +96,27 @@ class TeambuilderPokemon:
     @property
     def formatted_moves(self) -> str:
         return ",".join([to_id_str(move) for move in self.moves])
+    
+    @property
+    def formatted_teratype(self) -> str:
+        return self.teratype.upper()
 
     @property
     def formatted_endstring(self) -> str:
-        if self.hiddenpowertype and self.gmax:
-            return ",%s,,G" % self.hiddenpowertype
+        if self.hiddenpowertype and self.gmax and self.teratype:
+            return ",,%s,G,,%s" % self.hiddenpowertype, self.formatted_teratype
+        elif self.hiddenpowertype and self.gmax:
+            return ",,%s,G," % self.hiddenpowertype
+        elif self.hiddenpowertype and self.teratype:
+            return ",,%s,,,%s" % self.hiddenpowertype, self.formatted_teratype
+        elif self.gmax and self.teratype:
+            return ",,,G,,%s" % self.formatted_teratype
         elif self.hiddenpowertype:
-            return ",%s," % self.hiddenpowertype
+            return ",,%s," % self.hiddenpowertype
         elif self.gmax:
-            return ",,,G"
+            return ",,,G,"
+        elif self.teratype:
+            return ",,,,,%s" % self.formatted_teratype
         return ""
 
     @property
