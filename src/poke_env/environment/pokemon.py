@@ -397,8 +397,6 @@ class Pokemon:
         level = None
         tera_type = None
 
-        print(split_details)
-
         if len(split_details) == 4:
             species, level, gender, tera_type = split_details
         elif len(split_details) == 3:
