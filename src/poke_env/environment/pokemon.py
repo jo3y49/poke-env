@@ -44,7 +44,7 @@ class Pokemon:
         "_species",
         "_status",
         "_status_counter",
-        "_terastallized_type",
+        "_terastallize_type",
         "_terastallized",
         "_type_1",
         "_type_2",
@@ -96,7 +96,7 @@ class Pokemon:
         self._effects: Dict[Effect, int] = {}
         self._first_turn: bool = False
         self._terastallized: bool = False
-        self._terastallized_type: Optional[PokemonType] = None
+        self._terastallize_type: Optional[PokemonType] = None
         self._item: Optional[str] = self._data.UNKNOWN_ITEM
         self._last_request: dict = {}
         self._last_details: str = ""
@@ -395,12 +395,25 @@ class Pokemon:
 
         gender = None
         level = None
+        tera_type = None
 
-        if len(split_details) == 3:
-            species, level, gender = split_details
+        print(split_details)
+
+        if len(split_details) == 4:
+            species, level, gender, tera_type = split_details
+        elif len(split_details) == 3:
+            if split_details[1].startswith("L"):
+                if split_details[2].startswith("t"):
+                    species, level, tera_type = split_details
+                else: 
+                    species, level, gender = split_details
+            else:
+                species, gender, tera_type = split_details  
         elif len(split_details) == 2:
             if split_details[1].startswith("L"):
                 species, level = split_details
+            elif split_details[1].startswith("t"):
+                species, tera_type = split_details
             else:
                 species, gender = split_details
         else:
@@ -415,6 +428,11 @@ class Pokemon:
             self._level = int(level[1:])
         else:
             self._level = 100
+
+        if tera_type:
+            self._terastallize_type = PokemonType.from_name(tera_type.replace("tera:", ""))
+        else:
+            self._terastallize_type = None
 
         if species != self._species:
             self._update_from_pokedex(species)
