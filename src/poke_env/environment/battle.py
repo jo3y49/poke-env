@@ -24,14 +24,14 @@ class Battle(AbstractBattle):
         # Turn choice attributes
         self._available_moves: List[Move] = []
         self._available_switches: List[Pokemon] = []
-        self._can_dynamax: bool = False
         self._can_mega_evolve: bool = False
-        self._can_terastallize: Optional[PokemonType] = None
         self._can_z_move: bool = False
-        self._opponent_can_dynamax = True
+        self._can_dynamax: bool = False
+        self._can_terastallize: bool = None
         self._opponent_can_mega_evolve = True
         self._opponent_can_z_move = True
-        self._opponent_can_terastallize: bool = False
+        self._opponent_can_dynamax = True
+        self._opponent_can_terastallize: bool = True
         self._force_switch: bool = False
         self._maybe_trapped: bool = False
         self._trapped: bool = False
@@ -74,7 +74,7 @@ class Battle(AbstractBattle):
         self._can_mega_evolve = False
         self._can_z_move = False
         self._can_dynamax = False
-        self._can_terastallize = None
+        self._can_terastallize = False
         self._maybe_trapped = False
         self._reviving = any(
             [m["reviving"] for m in side.get("pokemon", []) if "reviving" in m]
@@ -115,9 +115,7 @@ class Battle(AbstractBattle):
             if active_request.get("maybeTrapped", False):
                 self._maybe_trapped = True
             if active_request.get("canTerastallize", False):
-                self._can_terastallize = PokemonType.from_name(
-                    active_request["canTerastallize"]
-                )
+                self._can_terastallize = True
 
         if side["pokemon"]:
             self._player_role = side["pokemon"][0]["ident"][:2]
@@ -202,10 +200,10 @@ class Battle(AbstractBattle):
         return self._can_mega_evolve
 
     @property
-    def can_terastallize(self) -> Optional[PokemonType]:
+    def can_terastallize(self) -> bool:
         """
-        :return: None, or the type the active pokemon can terastallize into.
-        :rtype: PokemonType, optional
+        :return: Whether or not the current active pokemon can terastallize.
+        :rtype: bool
         """
         return self._can_terastallize
 

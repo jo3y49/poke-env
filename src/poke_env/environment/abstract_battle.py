@@ -156,7 +156,7 @@ class AbstractBattle(ABC):
         self._rqid = 0
         self._rules = []
         self._turn: int = 0
-        self._opponent_can_terrastallize: bool = True
+        self._opponent_can_terastallize: bool = True
         self._opponent_dynamax_turn: Optional[int] = None
         self._opponent_rating: Optional[int] = None
         self._rating: Optional[int] = None
@@ -422,6 +422,8 @@ class AbstractBattle(ABC):
                     reveal_other_move = True
                 elif override_move == "Copycat":
                     pass
+                elif override_move == "Metronome":
+                    pass
                 else:
                     self.logger.warning(
                         "Unmanaged [from]move message received - move %s in cleaned up "
@@ -467,13 +469,14 @@ class AbstractBattle(ABC):
             elif len(split_message) == 5:
                 pokemon, move, presumed_target = split_message[2:5]
 
-                if len(presumed_target) > 4 and presumed_target[:4] in {
+                if len(presumed_target) >= 4 and presumed_target[:4] in {
                     "p1: ",
                     "p2: ",
                     "p1a:",
                     "p1b:",
                     "p2a:",
                     "p2b:",
+                    "null",
                 }:
                     pass
                 else:
@@ -484,6 +487,8 @@ class AbstractBattle(ABC):
                         self.battle_tag,
                         self.turn,
                     )
+            elif len(split_message) == 6:
+                pokemon, move, presumed_target = split_message[2:5]
             else:
                 pokemon, move, presumed_target = split_message[2:5]
                 self.logger.warning(
@@ -642,14 +647,21 @@ class AbstractBattle(ABC):
             side, condition = split_message[2:4]
             self._side_start(side, condition)
         elif split_message[1] == "-swapboost":
-            source, target, stats = split_message[2:5]
+            source, target = split_message[2:4]
             source = self.get_pokemon(source)
             target = self.get_pokemon(target)
-            for stat in stats.split(", "):
-                source._boosts[stat], target._boosts[stat] = (
-                    target._boosts[stat],
-                    source._boosts[stat],
-                )
+            if len(split_message) == 5:
+                source._boosts, target._boosts = (
+                        target._boosts,
+                        source._boosts,
+                    )
+            else:
+                stats = split_message[4]
+                for stat in stats.split(", "):
+                    source._boosts[stat], target._boosts[stat] = (
+                        target._boosts[stat],
+                        source._boosts[stat],
+                    )
         elif split_message[1] == "-transform":
             pokemon, into = split_message[2:4]
             self.get_pokemon(pokemon)._transform(self.get_pokemon(into))
@@ -845,6 +857,11 @@ class AbstractBattle(ABC):
     @property
     @abstractmethod
     def can_mega_evolve(self):  # pragma: no cover
+        pass
+
+    @property
+    @abstractmethod
+    def can_terastallize(self) -> bool: # pragma: no cover
         pass
 
     @property

@@ -553,7 +553,7 @@ class Move:
     @property
     def self_switch(self) -> Union[str, bool]:
         """
-        :return: What kind of self swtich this move implies for the user.
+        :return: What kind of self switch this move implies for the user.
         :rtype: Optional[str]
         """
         return self.entry.get("selfSwitch", False)
